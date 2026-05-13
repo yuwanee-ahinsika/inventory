@@ -11,8 +11,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
 
-    Route::apiResource('stocks', StockController::class);
-    Route::apiResource('stock-requests', StockRequestController::class);
+    Route::apiResource('stocks', StockController::class)->names([
+        'index' => 'api.stocks.index',
+        'store' => 'api.stocks.store',
+        'show' => 'api.stocks.show',
+        'update' => 'api.stocks.update',
+        'destroy' => 'api.stocks.destroy',
+    ]);
+    Route::apiResource('stock-requests', StockRequestController::class)->names([
+        'index' => 'api.stock-requests.index',
+        'store' => 'api.stock-requests.store',
+        'show' => 'api.stock-requests.show',
+        'update' => 'api.stock-requests.update',
+        'destroy' => 'api.stock-requests.destroy',
+    ]);
 
     Route::get('reports/low-stock', [ReportController::class, 'lowStock']);
     Route::get('reports/department-requests', [ReportController::class, 'departmentRequests']);

@@ -22,8 +22,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('users', \App\Http\Controllers\Web\UserController::class);
     });
 
+    // Stocks list is visible to everyone, but create/edit/delete is restricted
+    Route::get('stocks', [\App\Http\Controllers\Web\StockController::class, 'index'])->name('stocks.index');
     Route::middleware('role:Admin|Inventory Manager')->group(function () {
-        Route::resource('stocks', \App\Http\Controllers\Web\StockController::class);
+        Route::get('stocks/create', [\App\Http\Controllers\Web\StockController::class, 'create'])->name('stocks.create');
+        Route::post('stocks', [\App\Http\Controllers\Web\StockController::class, 'store'])->name('stocks.store');
+        Route::get('stocks/{stock}/edit', [\App\Http\Controllers\Web\StockController::class, 'edit'])->name('stocks.edit');
+        Route::put('stocks/{stock}', [\App\Http\Controllers\Web\StockController::class, 'update'])->name('stocks.update');
+        Route::delete('stocks/{stock}', [\App\Http\Controllers\Web\StockController::class, 'destroy'])->name('stocks.destroy');
+        
         Route::get('reports', [\App\Http\Controllers\Web\ReportController::class, 'index'])->name('reports.index');
     });
 

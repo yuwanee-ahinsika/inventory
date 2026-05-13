@@ -10,13 +10,31 @@ class StockController extends Controller
 {
     public function index(Request $request)
     {
+        // Debugging to see if this controller is actually reached
+        // echo "DEBUG: Reached Web\StockController@index"; 
+        
         $query = Stock::query();
         if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('sku', 'like', '%' . $request->search . '%');
+            });
         }
+        
+        if ($request->get('filter') === 'low-stock') {
+            $query->where('quantity', '<', 10);
+        }
+
         $stocks = $query->paginate(10);
-        return view('stocks.index', compact('stocks'));
+        
+        $stats = [
+            'total_items' => Stock::count(),
+            'total_quantity' => Stock::sum('quantity'),
+            'low_stock' => Stock::where('quantity', '<', 10)->count(),
+            'out_of_stock' => Stock::where('quantity', 0)->count(),
+        ];
+
+        return view('stocks.index', compact('stocks', 'stats'));
     }
 
     public function create()

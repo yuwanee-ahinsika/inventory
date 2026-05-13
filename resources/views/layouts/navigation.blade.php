@@ -27,10 +27,11 @@
                         </x-nav-link>
                     @endif
 
+                    <x-nav-link :href="route('stocks.index')" :active="request()->routeIs('stocks.*')">
+                        Stocks
+                    </x-nav-link>
+
                     @if(in_array($role, ['Admin', 'Inventory Manager']))
-                        <x-nav-link :href="route('stocks.index')" :active="request()->routeIs('stocks.*')">
-                            Stocks
-                        </x-nav-link>
                         <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
                             Reports
                         </x-nav-link>
@@ -106,10 +107,11 @@
                 </x-responsive-nav-link>
             @endif
 
+            <x-responsive-nav-link :href="route('stocks.index')" :active="request()->routeIs('stocks.*')">
+                Stocks
+            </x-responsive-nav-link>
+
             @if(in_array($role, ['Admin', 'Inventory Manager']))
-                <x-responsive-nav-link :href="route('stocks.index')" :active="request()->routeIs('stocks.*')">
-                    Stocks
-                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
                     Reports
                 </x-responsive-nav-link>

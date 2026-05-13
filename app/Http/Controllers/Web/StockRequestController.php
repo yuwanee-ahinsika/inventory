@@ -9,27 +9,45 @@ use Illuminate\Http\Request;
 
 class StockRequestController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         $roleName = $user->role->name ?? '';
 
-        if (in_array($roleName, ['Admin', 'Inventory Manager'])) {
-            $requests = StockRequest::with(['user', 'department', 'stock'])->latest()->paginate(10);
-        } else {
-            $requests = StockRequest::with(['user', 'department', 'stock'])
-                        ->where('department_id', $user->department_id)
-                        ->latest()
-                        ->paginate(10);
+        $query = StockRequest::with(['user', 'department', 'stock', 'processor']);
+
+        if ($request->has('status') && in_array($request->status, ['pending', 'approved', 'rejected'])) {
+            $query->where('status', $request->status);
         }
 
-        return view('stock-requests.index', compact('requests', 'roleName'));
+        if (in_array($roleName, ['Admin', 'Inventory Manager'])) {
+            $requests = $query->latest()->paginate(10);
+            $stats = [
+                'total_requests' => StockRequest::count(),
+                'pending' => StockRequest::where('status', 'pending')->count(),
+                'approved' => StockRequest::where('status', 'approved')->count(),
+                'rejected' => StockRequest::where('status', 'rejected')->count(),
+            ];
+        } else {
+            $requests = $query->where('department_id', $user->department_id)
+                              ->latest()
+                              ->paginate(10);
+            $stats = [
+                'total_requests' => StockRequest::where('department_id', $user->department_id)->count(),
+                'pending' => StockRequest::where('department_id', $user->department_id)->where('status', 'pending')->count(),
+                'approved' => StockRequest::where('department_id', $user->department_id)->where('status', 'approved')->count(),
+                'rejected' => StockRequest::where('department_id', $user->department_id)->where('status', 'rejected')->count(),
+            ];
+        }
+
+        return view('stock-requests.index', compact('requests', 'roleName', 'stats'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $selectedStockId = $request->get('stock_id');
         $stocks = Stock::where('quantity', '>', 0)->get();
-        return view('stock-requests.create', compact('stocks'));
+        return view('stock-requests.create', compact('stocks', 'selectedStockId'));
     }
 
     public function store(Request $request)
