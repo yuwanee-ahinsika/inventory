@@ -1,59 +1,109 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Inventory Management System (IMS)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A premium, Laravel-based Inventory Management System designed to centralize stock control, automate department supply requests, and provide deep analytical reporting for organizational efficiency.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 📦 Stock & Inventory Management
+- Centralized tracking of all physical stock items, including SKUs, descriptions, and real-time quantities.
+- Automated low-stock monitoring and out-of-stock prevention.
+- Premium, modern, and responsive UI built with Tailwind CSS.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🔄 Department Request Workflow
+- Department Users can seamlessly browse available stock and submit requests for items.
+- Built-in approval pipeline: Requests are logged as `pending` until reviewed.
+- Admin and Inventory Managers can `approve` or `reject` requests with a single click.
+- Automatic stock deduction upon request approval.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 📊 Advanced Reporting Module
+- **System Overview:** High-level dashboard of total volume, pending approvals, and rejected requests.
+- **Low Stock Analysis:** Instantly identify items that require reordering.
+- **Department Requests:** Track which departments are consuming the most resources.
+- **Stock Movement History:** Granular tracking of exactly *who* took *what* and *when*.
+- **Data Export:** Built-in "Export to CSV" functionality for all tabular data.
+- **Print-Ready Mode:** Clean, distraction-free print styling for physical record-keeping.
 
-## Learning Laravel
+### 🔐 User Roles & Secure Access
+- **Roles:** Admin, Inventory Manager, and Department User.
+- **Conditional Workflows:** Users only see data and actions relevant to their department and role.
+- **API Security:** Fully featured REST API protected by Laravel Sanctum authentication.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Requirements
+- **PHP** >= 8.1
+- **Laravel** 11.x
+- **MySQL** (or compatible database)
+- **Composer** (PHP dependency manager)
+- **Node.js & NPM** (for compiling Tailwind CSS via Vite)
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Installation
 
-### Premium Partners
+**1. Clone the repository**
+```bash
+git clone https://github.com/yuwanee-ahinsika/inventory.git
+cd inventory
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**2. Install PHP dependencies**
+```bash
+composer install
+```
 
-## Contributing
+**3. Install NPM dependencies & compile frontend assets**
+```bash
+npm install
+npm run build
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**4. Environment setup**
+```bash
+cp .env.example .env
+```
+*Update your `.env` file with your local database credentials, and ensure `APP_TIMEZONE` is set to your local time (e.g., `Asia/Colombo`).*
 
-## Code of Conduct
+**5. Generate application key**
+```bash
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**6. Run database migrations**
+```bash
+php artisan migrate
+```
 
-## Security Vulnerabilities
+**7. Seed initial roles & admin accounts (if applicable)**
+```bash
+php artisan db:seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**8. Serve the application**
+```bash
+php artisan serve
+```
 
-## License
+Access the web application at [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## Usage Guide
+
+- **Dashboard:** Instantly view your relevant metrics. Admins see system-wide stats, while Department Users see their specific request statuses.
+- **Stocks Panel:** Manage the master inventory list. Create, edit, and monitor available quantities.
+- **Stock Requests:** Department users submit forms here. Managers use this panel to approve or reject pending requests.
+- **Reports:** Generate, filter (by date/department), print, and export CSV data for audits and supply chain management.
+- **API Endpoints:** Use `/api/login` to obtain a Sanctum Bearer token, which grants programmatic access to manage `/api/stocks` and `/api/stock-requests`.
+
+---
+
+## Code Structure Overview
+
+- **`Controllers/Web`**: Handles all browser-based routing, form validation, and Blade view compilation.
+- **`Controllers/Api`**: Handles pure JSON REST API requests, strictly returning data arrays and status codes.
+- **`Models`**: Eloquent models representing `User`, `Role`, `Department`, `Stock`, and `StockRequest` with strict relationship mapping.
+- **`Views`**: Premium UI Blade templates (`resources/views/`) heavily styled with dynamic Tailwind CSS classes and custom print media queries.
+- **`Routes`**: Web routes are defined in `web.php` (protected by `RoleMiddleware`), and API endpoints are mapped in `api.php` (protected by `auth:sanctum`).
+
+Happy Coding!! ✨
