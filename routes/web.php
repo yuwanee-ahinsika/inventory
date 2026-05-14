@@ -24,7 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Stocks list is visible to everyone, but create/edit/delete is restricted
     Route::get('stocks', [\App\Http\Controllers\Web\StockController::class, 'index'])->name('stocks.index');
-    Route::middleware('role:Admin|Inventory Manager')->group(function () {
+    Route::middleware('role:Admin,Inventory Manager')->group(function () {
         Route::get('stocks/create', [\App\Http\Controllers\Web\StockController::class, 'create'])->name('stocks.create');
         Route::post('stocks', [\App\Http\Controllers\Web\StockController::class, 'store'])->name('stocks.store');
         Route::get('stocks/{stock}/edit', [\App\Http\Controllers\Web\StockController::class, 'edit'])->name('stocks.edit');
@@ -37,7 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Everyone can access requests, but what they see/do is handled in controller
     Route::resource('stock-requests', \App\Http\Controllers\Web\StockRequestController::class);
     
-    Route::middleware('role:Admin|Inventory Manager')->group(function () {
+    Route::middleware('role:Admin,Inventory Manager')->group(function () {
         Route::post('stock-requests/{stock_request}/approve', [\App\Http\Controllers\Web\StockRequestController::class, 'approve'])->name('stock-requests.approve');
         Route::post('stock-requests/{stock_request}/reject', [\App\Http\Controllers\Web\StockRequestController::class, 'reject'])->name('stock-requests.reject');
     });

@@ -5,12 +5,20 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\StockRequestController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Api\AuthController;
 
+// Public API Routes
+Route::post('/login', [AuthController::class, 'login']);
+
+// Protected API Routes
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
+    // Rename API routes to prevent collision with Web routes
     Route::apiResource('stocks', StockController::class)->names([
         'index' => 'api.stocks.index',
         'store' => 'api.stocks.store',
@@ -18,6 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         'update' => 'api.stocks.update',
         'destroy' => 'api.stocks.destroy',
     ]);
+
     Route::apiResource('stock-requests', StockRequestController::class)->names([
         'index' => 'api.stock-requests.index',
         'store' => 'api.stock-requests.store',
