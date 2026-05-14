@@ -43,7 +43,7 @@ A premium, Laravel-based Inventory Management System designed to centralize stoc
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/yuwanee-ahinsika/inventory.git
+git clone https://github.com/yourusername/inventory.git
 cd inventory
 ```
 
