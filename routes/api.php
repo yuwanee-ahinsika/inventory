@@ -7,34 +7,24 @@ use App\Http\Controllers\Api\StockRequestController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\AuthController;
 
-// Public API Routes
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-// Protected API Routes
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+Route::get('/stocks', [StockController::class, 'index']);
+Route::post('/stocks', [StockController::class, 'store']);
+Route::get('/stocks/{stock}', [StockController::class, 'show']);
+Route::put('/stocks/{stock}', [StockController::class, 'update']);
+Route::delete('/stocks/{stock}', [StockController::class, 'destroy']);
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+Route::get('/stock-requests', [StockRequestController::class, 'index']);
+Route::post('/stock-requests', [StockRequestController::class, 'store']);
+Route::get('/stock-requests/{stock_request}', [StockRequestController::class, 'show']);
+Route::put('/stock-requests/{stock_request}', [StockRequestController::class, 'update']);
+Route::delete('/stock-requests/{stock_request}', [StockRequestController::class, 'destroy']);
 
-    // Rename API routes to prevent collision with Web routes
-    Route::apiResource('stocks', StockController::class)->names([
-        'index' => 'api.stocks.index',
-        'store' => 'api.stocks.store',
-        'show' => 'api.stocks.show',
-        'update' => 'api.stocks.update',
-        'destroy' => 'api.stocks.destroy',
-    ]);
-
-    Route::apiResource('stock-requests', StockRequestController::class)->names([
-        'index' => 'api.stock-requests.index',
-        'store' => 'api.stock-requests.store',
-        'show' => 'api.stock-requests.show',
-        'update' => 'api.stock-requests.update',
-        'destroy' => 'api.stock-requests.destroy',
-    ]);
-
-    Route::get('reports/low-stock', [ReportController::class, 'lowStock']);
-    Route::get('reports/department-requests', [ReportController::class, 'departmentRequests']);
-});
+Route::get('/reports/low-stock', [ReportController::class, 'lowStock']);
+Route::get('/reports/department-requests', [ReportController::class, 'departmentRequests']);
