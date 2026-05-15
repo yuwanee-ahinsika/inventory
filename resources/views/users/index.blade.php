@@ -35,11 +35,11 @@
                                 <td class="p-3">{{ $user->name }}</td>
                                 <td class="p-3">{{ $user->email }}</td>
                                 <td class="p-3">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $user->role->name === 'Admin' ? 'bg-purple-100 text-purple-800' : ($user->role->name === 'Inventory Manager' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
-                                        {{ $user->role->name }}
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ ($user->role->name ?? '') === 'Admin' ? 'bg-purple-100 text-purple-800' : (($user->role->name ?? '') === 'Inventory Manager' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
+                                        {{ $user->role->name ?? 'Unassigned' }}
                                     </span>
                                 </td>
-                                <td class="p-3">{{ $user->department->name }}</td>
+                                <td class="p-3">{{ $user->department->name ?? 'Unassigned' }}</td>
                                 <td class="p-3 flex space-x-3 text-sm">
                                     <a href="{{ route('users.edit', $user) }}" class="text-blue-600 hover:text-blue-900 font-medium">Edit</a>
                                     <form action="{{ route('users.destroy', $user) }}" method="POST" onsubmit="return confirm('Delete this user?');" class="inline">
