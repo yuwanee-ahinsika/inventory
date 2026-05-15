@@ -2,9 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StockController;
-use App\Http\Controllers\StockRequestController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Api\StockController;
+use App\Http\Controllers\Api\StockRequestController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\AuthController;
 
 // Public API Routes
