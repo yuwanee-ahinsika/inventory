@@ -112,6 +112,14 @@ class StockRequestController extends Controller
      */
     public function hodApprove(Request $request, StockRequest $stock_request)
     {
+        $user = auth()->user();
+        $isAssignedHod = ($stock_request->user->hod_id ?? null) === $user->id;
+        $isDeptHod = ($user->role->name ?? '') === 'HOD' && $stock_request->department_id === $user->department_id;
+
+        if (!$isAssignedHod && !$isDeptHod) {
+            abort(403, 'Unauthorized action.');
+        }
+
         if ($stock_request->status !== 'pending_hod') {
             return back()->withErrors(['error' => 'This request is not pending HOD approval.']);
         }
@@ -130,6 +138,14 @@ class StockRequestController extends Controller
      */
     public function hodReject(Request $request, StockRequest $stock_request)
     {
+        $user = auth()->user();
+        $isAssignedHod = ($stock_request->user->hod_id ?? null) === $user->id;
+        $isDeptHod = ($user->role->name ?? '') === 'HOD' && $stock_request->department_id === $user->department_id;
+
+        if (!$isAssignedHod && !$isDeptHod) {
+            abort(403, 'Unauthorized action.');
+        }
+
         if ($stock_request->status !== 'pending_hod') {
             return back()->withErrors(['error' => 'This request is not pending HOD approval.']);
         }

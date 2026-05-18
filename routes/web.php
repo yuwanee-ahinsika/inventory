@@ -40,7 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('stock-requests', \App\Http\Controllers\StockRequestController::class);
     
     // HOD approval routes
-    Route::middleware('role:HOD')->group(function () {
+    Route::middleware('role:HOD,Admin')->group(function () {
         Route::post('stock-requests/{stock_request}/hod-approve', [\App\Http\Controllers\StockRequestController::class, 'hodApprove'])->name('stock-requests.hod-approve');
         Route::post('stock-requests/{stock_request}/hod-reject', [\App\Http\Controllers\StockRequestController::class, 'hodReject'])->name('stock-requests.hod-reject');
     });

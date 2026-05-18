@@ -155,17 +155,17 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         @if($roleName === 'Admin')
                                             <div class="flex items-center justify-end space-x-3">
-                                                @if($request->status === 'pending_manager')
-                                                    <form action="{{ route('stock-requests.approve', $request) }}" method="POST" class="inline">
+                                                @if($request->status === 'pending_hod' && $request->user->hod_id === auth()->id())
+                                                    <form action="{{ route('stock-requests.hod-approve', $request) }}" method="POST" class="inline">
                                                         @csrf
-                                                        <button type="submit" class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition shadow-sm">Approve</button>
+                                                        <button type="submit" class="px-3 py-1.5 bg-orange-600 text-white rounded-lg text-xs font-bold hover:bg-orange-700 transition shadow-sm">HOD Approve</button>
                                                     </form>
-                                                    <form action="{{ route('stock-requests.reject', $request) }}" method="POST" class="inline">
+                                                    <form action="{{ route('stock-requests.hod-reject', $request) }}" method="POST" class="inline">
                                                         @csrf
                                                         <button type="submit" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition shadow-sm">Reject</button>
                                                     </form>
                                                 @endif
-                                                
+
                                                 <a href="{{ route('stock-requests.edit', $request) }}" class="text-indigo-600 hover:text-indigo-900 font-bold text-xs bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">Edit</a>
                                                 
                                                 <form action="{{ route('stock-requests.destroy', $request) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this request?');" class="inline">
