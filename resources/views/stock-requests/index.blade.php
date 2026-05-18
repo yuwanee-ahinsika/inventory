@@ -153,8 +153,29 @@
                                     </td>
                                     @if(in_array($roleName, ['Admin', 'Inventory Manager', 'HOD']))
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        @if($roleName === 'Admin')
+                                            <div class="flex items-center justify-end space-x-3">
+                                                @if($request->status === 'pending_manager')
+                                                    <form action="{{ route('stock-requests.approve', $request) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        <button type="submit" class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition shadow-sm">Approve</button>
+                                                    </form>
+                                                    <form action="{{ route('stock-requests.reject', $request) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        <button type="submit" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition shadow-sm">Reject</button>
+                                                    </form>
+                                                @endif
+                                                
+                                                <a href="{{ route('stock-requests.edit', $request) }}" class="text-indigo-600 hover:text-indigo-900 font-bold text-xs bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all">Edit</a>
+                                                
+                                                <form action="{{ route('stock-requests.destroy', $request) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this request?');" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900 font-bold text-xs bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-all">Delete</button>
+                                                </form>
+                                            </div>
                                         {{-- HOD can approve/reject requests that are pending_hod --}}
-                                        @if($request->status === 'pending_hod' && $roleName === 'HOD')
+                                        @elseif($request->status === 'pending_hod' && $roleName === 'HOD')
                                             <div class="flex items-center justify-end space-x-2">
                                                 <form action="{{ route('stock-requests.hod-approve', $request) }}" method="POST" class="inline">
                                                     @csrf
@@ -165,8 +186,8 @@
                                                     <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition shadow-sm">Reject</button>
                                                 </form>
                                             </div>
-                                        {{-- Admin/Manager can approve/reject requests that are pending_manager --}}
-                                        @elseif($request->status === 'pending_manager' && in_array($roleName, ['Admin', 'Inventory Manager']))
+                                        {{-- Manager can approve/reject requests that are pending_manager --}}
+                                        @elseif($request->status === 'pending_manager' && $roleName === 'Inventory Manager')
                                             <div class="flex items-center justify-end space-x-2">
                                                 <form action="{{ route('stock-requests.approve', $request) }}" method="POST" class="inline">
                                                     @csrf

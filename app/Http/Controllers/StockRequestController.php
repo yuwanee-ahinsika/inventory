@@ -184,4 +184,42 @@ class StockRequestController extends Controller
 
         return back()->with('success', 'Request rejected.');
     }
+
+    public function edit(StockRequest $stockRequest)
+    {
+        if (auth()->user()->role->name !== 'Admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $stocks = Stock::all();
+        return view('stock-requests.edit', compact('stockRequest', 'stocks'));
+    }
+
+    public function update(Request $request, StockRequest $stockRequest)
+    {
+        if (auth()->user()->role->name !== 'Admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'stock_id' => 'required|exists:stocks,id',
+            'quantity' => 'required|integer|min:1',
+            'status' => 'required|in:pending_hod,pending_manager,approved,rejected',
+        ]);
+
+        $stockRequest->update($validated);
+
+        return redirect()->route('stock-requests.index')->with('success', 'Stock request updated successfully.');
+    }
+
+    public function destroy(StockRequest $stockRequest)
+    {
+        if (auth()->user()->role->name !== 'Admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $stockRequest->delete();
+
+        return redirect()->route('stock-requests.index')->with('success', 'Stock request deleted successfully.');
+    }
 }
