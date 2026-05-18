@@ -30,7 +30,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('stocks/{stock}/edit', [\App\Http\Controllers\StockController::class, 'edit'])->name('stocks.edit');
         Route::put('stocks/{stock}', [\App\Http\Controllers\StockController::class, 'update'])->name('stocks.update');
         Route::delete('stocks/{stock}', [\App\Http\Controllers\StockController::class, 'destroy'])->name('stocks.destroy');
-        
+    });
+
+    Route::middleware('role:Admin,Inventory Manager,HOD')->group(function () {
         Route::get('reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     });
 

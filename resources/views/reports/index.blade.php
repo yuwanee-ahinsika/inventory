@@ -35,6 +35,7 @@
                             <svg class="w-5 h-5 mr-3 {{ $type === 'system-overview' ? 'text-purple-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                             System Overview
                         </a>
+                        @if(auth()->user()->role->name !== 'HOD')
                         <a href="{{ route('reports.index', ['type' => 'stock-availability']) }}" class="flex items-center px-3 py-2.5 text-sm font-bold rounded-xl transition-all {{ $type === 'stock-availability' ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                             <svg class="w-5 h-5 mr-3 {{ $type === 'stock-availability' ? 'text-purple-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                             Stock Availability
@@ -43,6 +44,7 @@
                             <svg class="w-5 h-5 mr-3 {{ $type === 'low-stock' ? 'text-purple-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             Low Stock Items
                         </a>
+                        @endif
                         <a href="{{ route('reports.index', ['type' => 'department']) }}" class="flex items-center px-3 py-2.5 text-sm font-bold rounded-xl transition-all {{ $type === 'department' ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                             <svg class="w-5 h-5 mr-3 {{ $type === 'department' ? 'text-purple-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                             Department Requests
@@ -76,6 +78,7 @@
                     <form action="{{ route('reports.index') }}" method="GET" class="flex flex-col lg:flex-row lg:items-end gap-4">
                         <input type="hidden" name="type" value="{{ $type }}">
                         
+                        @if(auth()->user()->role->name !== 'HOD')
                         <div class="flex-1">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Department</label>
                             <select name="department_id" class="block w-full rounded-xl border-gray-200 bg-gray-50 focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
@@ -85,6 +88,7 @@
                                 @endforeach
                             </select>
                         </div>
+                        @endif
 
                         <div class="flex-1">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Start Date</label>
@@ -235,6 +239,7 @@
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Department</th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Item Name</th>
                                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Total Requests</th>
                                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Total Items Requested</th>
                                     </tr>
@@ -243,6 +248,7 @@
                                     @forelse($data as $row)
                                     <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ $row->department->name ?? 'Unknown' }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600 font-medium">{{ $row->stock->name ?? 'Unknown' }}</td>
                                         <td class="px-6 py-4 text-center">
                                             <span class="text-lg font-bold text-gray-700">{{ $row->total_requests }}</span>
                                         </td>
@@ -252,7 +258,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="3" class="px-6 py-12 text-center text-gray-500">No records found for the selected criteria.</td>
+                                        <td colspan="4" class="px-6 py-12 text-center text-gray-500">No records found for the selected criteria.</td>
                                     </tr>
                                     @endforelse
                                 </tbody>

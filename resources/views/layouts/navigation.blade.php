@@ -31,7 +31,7 @@
                         Stocks
                     </x-nav-link>
 
-                    @if(in_array($role, ['Admin', 'Inventory Manager']))
+                    @if(in_array($role, ['Admin', 'Inventory Manager', 'HOD']))
                         <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
                             Reports
                         </x-nav-link>
@@ -111,7 +111,7 @@
                 Stocks
             </x-responsive-nav-link>
 
-            @if(in_array($role, ['Admin', 'Inventory Manager']))
+            @if(in_array($role, ['Admin', 'Inventory Manager', 'HOD']))
                 <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
                     Reports
                 </x-responsive-nav-link>
