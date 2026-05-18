@@ -22,7 +22,9 @@ class StockController extends Controller
         }
         
         if ($request->get('filter') === 'low-stock') {
-            $query->where('quantity', '<', 10);
+            $query->where('quantity', '>', 0)->where('quantity', '<', 10);
+        } elseif ($request->get('filter') === 'out-of-stock') {
+            $query->where('quantity', 0);
         }
 
         $stocks = $query->paginate(10);
@@ -30,7 +32,7 @@ class StockController extends Controller
         $stats = [
             'total_items' => Stock::count(),
             'total_quantity' => Stock::sum('quantity'),
-            'low_stock' => Stock::where('quantity', '<', 10)->count(),
+            'low_stock' => Stock::where('quantity', '>', 0)->where('quantity', '<', 10)->count(),
             'out_of_stock' => Stock::where('quantity', 0)->count(),
         ];
 

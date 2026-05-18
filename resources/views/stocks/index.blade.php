@@ -83,6 +83,7 @@
                                     class="block w-full pl-3 pr-10 py-3 text-sm border-gray-200 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-xl bg-gray-50 transition-all">
                                     <option value="">All Inventory</option>
                                     <option value="low-stock" {{ request('filter') === 'low-stock' ? 'selected' : '' }}>Low Stock Items</option>
+                                    <option value="out-of-stock" {{ request('filter') === 'out-of-stock' ? 'selected' : '' }}>Out of Stock Items</option>
                                 </select>
                             </form>
                         </div>
