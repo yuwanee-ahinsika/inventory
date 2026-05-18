@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StockRequest extends Model
 {
-    protected $fillable = ['user_id', 'department_id', 'stock_id', 'quantity', 'status', 'processed_by'];
+    protected $fillable = ['user_id', 'department_id', 'stock_id', 'quantity', 'status', 'hod_status', 'processed_by', 'hod_approved_by'];
 
     public function user()
     {
@@ -26,5 +26,10 @@ class StockRequest extends Model
     public function processor()
     {
         return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    public function hodApprover()
+    {
+        return $this->belongsTo(User::class, 'hod_approved_by');
     }
 }

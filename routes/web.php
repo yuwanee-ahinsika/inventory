@@ -16,7 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // Web Routes
+    // Web Routes - Admin only
     Route::middleware('role:Admin')->group(function () {
         Route::resource('departments', \App\Http\Controllers\DepartmentController::class);
         Route::resource('users', \App\Http\Controllers\UserController::class);
@@ -37,6 +37,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Everyone can access requests, but what they see/do is handled in controller
     Route::resource('stock-requests', \App\Http\Controllers\StockRequestController::class);
     
+    // HOD approval routes
+    Route::middleware('role:HOD')->group(function () {
+        Route::post('stock-requests/{stock_request}/hod-approve', [\App\Http\Controllers\StockRequestController::class, 'hodApprove'])->name('stock-requests.hod-approve');
+        Route::post('stock-requests/{stock_request}/hod-reject', [\App\Http\Controllers\StockRequestController::class, 'hodReject'])->name('stock-requests.hod-reject');
+    });
+
+    // Manager/Admin approval routes (only after HOD has approved)
     Route::middleware('role:Admin,Inventory Manager')->group(function () {
         Route::post('stock-requests/{stock_request}/approve', [\App\Http\Controllers\StockRequestController::class, 'approve'])->name('stock-requests.approve');
         Route::post('stock-requests/{stock_request}/reject', [\App\Http\Controllers\StockRequestController::class, 'reject'])->name('stock-requests.reject');

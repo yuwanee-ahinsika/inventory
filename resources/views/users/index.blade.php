@@ -26,6 +26,7 @@
                                 <th class="p-3 font-semibold text-gray-600">Email</th>
                                 <th class="p-3 font-semibold text-gray-600">Role</th>
                                 <th class="p-3 font-semibold text-gray-600">Department</th>
+                                <th class="p-3 font-semibold text-gray-600">HOD</th>
                                 <th class="p-3 font-semibold text-gray-600 w-32">Actions</th>
                             </tr>
                         </thead>
@@ -35,11 +36,22 @@
                                 <td class="p-3">{{ $user->name }}</td>
                                 <td class="p-3">{{ $user->email }}</td>
                                 <td class="p-3">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ ($user->role->name ?? '') === 'Admin' ? 'bg-purple-100 text-purple-800' : (($user->role->name ?? '') === 'Inventory Manager' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                                        {{ ($user->role->name ?? '') === 'Admin' ? 'bg-purple-100 text-purple-800' : 
+                                           (($user->role->name ?? '') === 'Inventory Manager' ? 'bg-blue-100 text-blue-800' : 
+                                           (($user->role->name ?? '') === 'HOD' ? 'bg-orange-100 text-orange-800' : 
+                                           'bg-gray-100 text-gray-800')) }}">
                                         {{ $user->role->name ?? 'Unassigned' }}
                                     </span>
                                 </td>
                                 <td class="p-3">{{ $user->department->name ?? 'Unassigned' }}</td>
+                                <td class="p-3">
+                                    @if($user->hod)
+                                        <span class="text-sm text-gray-700">{{ $user->hod->name }}</span>
+                                    @else
+                                        <span class="text-xs text-gray-400">—</span>
+                                    @endif
+                                </td>
                                 <td class="p-3 flex space-x-3 text-sm">
                                     <a href="{{ route('users.edit', $user) }}" class="text-blue-600 hover:text-blue-900 font-medium">Edit</a>
                                     <form action="{{ route('users.destroy', $user) }}" method="POST" onsubmit="return confirm('Delete this user?');" class="inline">
@@ -51,7 +63,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="p-4 text-center text-gray-500">No users found.</td>
+                                <td colspan="6" class="p-4 text-center text-gray-500">No users found.</td>
                             </tr>
                             @endforelse
                         </tbody>

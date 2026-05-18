@@ -55,6 +55,18 @@
                             </div>
                         </div>
 
+                        <!-- HOD Selection - Only visible when role is Department User -->
+                        <div class="mb-4" id="hod-section" style="display: none;">
+                            <label for="hod_id" class="block text-sm font-medium text-gray-700">Assign HOD (Head of Department) *</label>
+                            <select name="hod_id" id="hod_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Select HOD</option>
+                                @foreach($hods as $hod)
+                                    <option value="{{ $hod->id }}" {{ old('hod_id', $user->hod_id) == $hod->id ? 'selected' : '' }}>{{ $hod->name }} ({{ $hod->department->name ?? 'N/A' }})</option>
+                                @endforeach
+                            </select>
+                            @error('hod_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                        </div>
+
                         <div class="flex items-center justify-end mt-4">
                             <a href="{{ route('users.index') }}" class="text-gray-600 hover:underline mr-4">Cancel</a>
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow">
@@ -66,4 +78,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleSelect = document.getElementById('role_id');
+            const hodSection = document.getElementById('hod-section');
+            const deptUserRoleId = '{{ $deptUserRoleId ?? "" }}';
+
+            function toggleHodSection() {
+                if (roleSelect.value === deptUserRoleId) {
+                    hodSection.style.display = 'block';
+                } else {
+                    hodSection.style.display = 'none';
+                }
+            }
+
+            roleSelect.addEventListener('change', toggleHodSection);
+            toggleHodSection(); // Run on page load
+        });
+    </script>
 </x-app-layout>

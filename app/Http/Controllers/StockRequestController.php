@@ -14,29 +14,46 @@ class StockRequestController extends Controller
         $user = auth()->user();
         $roleName = $user->role->name ?? '';
 
-        $query = StockRequest::with(['user', 'department', 'stock', 'processor']);
+        $query = StockRequest::with(['user', 'department', 'stock', 'processor', 'hodApprover']);
 
-        if ($request->has('status') && in_array($request->status, ['pending', 'approved', 'rejected'])) {
+        // Status filter
+        if ($request->has('status') && in_array($request->status, ['pending_hod', 'pending_manager', 'approved', 'rejected'])) {
             $query->where('status', $request->status);
         }
 
         if (in_array($roleName, ['Admin', 'Inventory Manager'])) {
+            // Admin/Manager see all requests
             $requests = $query->latest()->paginate(10);
             $stats = [
                 'total_requests' => StockRequest::count(),
-                'pending' => StockRequest::where('status', 'pending')->count(),
+                'pending_hod' => StockRequest::where('status', 'pending_hod')->count(),
+                'pending_manager' => StockRequest::where('status', 'pending_manager')->count(),
                 'approved' => StockRequest::where('status', 'approved')->count(),
                 'rejected' => StockRequest::where('status', 'rejected')->count(),
             ];
-        } else {
+        } elseif ($roleName === 'HOD') {
+            // HOD sees requests from their department
             $requests = $query->where('department_id', $user->department_id)
                               ->latest()
                               ->paginate(10);
             $stats = [
                 'total_requests' => StockRequest::where('department_id', $user->department_id)->count(),
-                'pending' => StockRequest::where('department_id', $user->department_id)->where('status', 'pending')->count(),
+                'pending_hod' => StockRequest::where('department_id', $user->department_id)->where('status', 'pending_hod')->count(),
+                'pending_manager' => StockRequest::where('department_id', $user->department_id)->where('status', 'pending_manager')->count(),
                 'approved' => StockRequest::where('department_id', $user->department_id)->where('status', 'approved')->count(),
                 'rejected' => StockRequest::where('department_id', $user->department_id)->where('status', 'rejected')->count(),
+            ];
+        } else {
+            // Department User sees only their own requests
+            $requests = $query->where('user_id', $user->id)
+                              ->latest()
+                              ->paginate(10);
+            $stats = [
+                'total_requests' => StockRequest::where('user_id', $user->id)->count(),
+                'pending_hod' => StockRequest::where('user_id', $user->id)->where('status', 'pending_hod')->count(),
+                'pending_manager' => StockRequest::where('user_id', $user->id)->where('status', 'pending_manager')->count(),
+                'approved' => StockRequest::where('user_id', $user->id)->where('status', 'approved')->count(),
+                'rejected' => StockRequest::where('user_id', $user->id)->where('status', 'rejected')->count(),
             ];
         }
 
@@ -64,22 +81,75 @@ class StockRequestController extends Controller
         }
 
         $user = auth()->user();
+        $roleName = $user->role->name ?? '';
+
+        // HOD requests skip HOD approval and go directly to Inventory Manager
+        if ($roleName === 'HOD') {
+            $status = 'pending_manager';
+            $hodStatus = 'approved';
+            $successMsg = 'Stock request submitted. Forwarded directly to Inventory Manager.';
+        } else {
+            $status = 'pending_hod';
+            $hodStatus = 'pending_hod';
+            $successMsg = 'Stock request submitted. Waiting for HOD approval.';
+        }
 
         StockRequest::create([
             'user_id' => $user->id,
             'department_id' => $user->department_id,
             'stock_id' => $stock->id,
             'quantity' => $validated['quantity'],
-            'status' => 'pending',
+            'status' => $status,
+            'hod_status' => $hodStatus,
+            'hod_approved_by' => $roleName === 'HOD' ? $user->id : null,
         ]);
 
-        return redirect()->route('stock-requests.index')->with('success', 'Stock requested successfully.');
+        return redirect()->route('stock-requests.index')->with('success', $successMsg);
     }
 
+    /**
+     * HOD approves the request - moves it to Inventory Manager
+     */
+    public function hodApprove(Request $request, StockRequest $stock_request)
+    {
+        if ($stock_request->status !== 'pending_hod') {
+            return back()->withErrors(['error' => 'This request is not pending HOD approval.']);
+        }
+
+        $stock_request->update([
+            'status' => 'pending_manager',
+            'hod_status' => 'approved',
+            'hod_approved_by' => auth()->id(),
+        ]);
+
+        return back()->with('success', 'Request approved by HOD. Forwarded to Inventory Manager.');
+    }
+
+    /**
+     * HOD rejects the request
+     */
+    public function hodReject(Request $request, StockRequest $stock_request)
+    {
+        if ($stock_request->status !== 'pending_hod') {
+            return back()->withErrors(['error' => 'This request is not pending HOD approval.']);
+        }
+
+        $stock_request->update([
+            'status' => 'rejected',
+            'hod_status' => 'rejected',
+            'hod_approved_by' => auth()->id(),
+        ]);
+
+        return back()->with('success', 'Request rejected by HOD.');
+    }
+
+    /**
+     * Inventory Manager / Admin approves the request - deducts stock
+     */
     public function approve(Request $request, StockRequest $stock_request)
     {
-        if ($stock_request->status !== 'pending') {
-            return back()->withErrors(['error' => 'Request is already processed.']);
+        if ($stock_request->status !== 'pending_manager') {
+            return back()->withErrors(['error' => 'This request must be approved by HOD first.']);
         }
 
         $stock = $stock_request->stock;
@@ -98,10 +168,13 @@ class StockRequestController extends Controller
         return back()->with('success', 'Request approved successfully.');
     }
 
+    /**
+     * Inventory Manager / Admin rejects the request
+     */
     public function reject(Request $request, StockRequest $stock_request)
     {
-        if ($stock_request->status !== 'pending') {
-            return back()->withErrors(['error' => 'Request is already processed.']);
+        if ($stock_request->status !== 'pending_manager') {
+            return back()->withErrors(['error' => 'This request must be approved by HOD first.']);
         }
 
         $stock_request->update([

@@ -13,7 +13,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with(['role', 'department'])->paginate(10);
+        $users = User::with(['role', 'department', 'hod'])->paginate(10);
         return view('users.index', compact('users'));
     }
 
@@ -21,7 +21,12 @@ class UserController extends Controller
     {
         $roles = Role::all();
         $departments = Department::all();
-        return view('users.create', compact('roles', 'departments'));
+        // Get all users with HOD role for the HOD dropdown
+        $hodRole = Role::where('name', 'HOD')->first();
+        $hods = $hodRole ? User::where('role_id', $hodRole->id)->get() : collect();
+        // Get Department User role id for JS conditional logic
+        $deptUserRoleId = Role::where('name', 'Department User')->first()?->id;
+        return view('users.create', compact('roles', 'departments', 'hods', 'deptUserRoleId'));
     }
 
     public function store(Request $request)
@@ -32,6 +37,7 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'role_id' => 'required|exists:roles,id',
             'department_id' => 'required|exists:departments,id',
+            'hod_id' => 'nullable|exists:users,id',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -44,7 +50,10 @@ class UserController extends Controller
     {
         $roles = Role::all();
         $departments = Department::all();
-        return view('users.edit', compact('user', 'roles', 'departments'));
+        $hodRole = Role::where('name', 'HOD')->first();
+        $hods = $hodRole ? User::where('role_id', $hodRole->id)->get() : collect();
+        $deptUserRoleId = Role::where('name', 'Department User')->first()?->id;
+        return view('users.edit', compact('user', 'roles', 'departments', 'hods', 'deptUserRoleId'));
     }
 
     public function update(Request $request, User $user)
@@ -54,11 +63,18 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role_id' => 'required|exists:roles,id',
             'department_id' => 'required|exists:departments,id',
+            'hod_id' => 'nullable|exists:users,id',
         ]);
 
         if ($request->filled('password')) {
             $request->validate(['password' => 'string|min:8']);
             $validated['password'] = Hash::make($request->password);
+        }
+
+        // Clear hod_id if role is not Department User
+        $deptUserRole = Role::where('name', 'Department User')->first();
+        if ($deptUserRole && $validated['role_id'] != $deptUserRole->id) {
+            $validated['hod_id'] = null;
         }
 
         $user->update($validated);
