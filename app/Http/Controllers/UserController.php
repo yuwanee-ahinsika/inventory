@@ -21,9 +21,13 @@ class UserController extends Controller
     {
         $roles = Role::all();
         $departments = Department::all();
-        // Get all users with HOD role for the HOD dropdown
         $hodRole = Role::where('name', 'HOD')->first();
-        $hods = $hodRole ? User::where('role_id', $hodRole->id)->get() : collect();
+        $hods = User::where(function($q) use ($hodRole) {
+            if ($hodRole) {
+                $q->where('role_id', $hodRole->id);
+            }
+            $q->orWhere('name', 'General Manager');
+        })->get();
         // Get Department User role id for JS conditional logic
         $deptUserRoleId = Role::where('name', 'Department User')->first()?->id;
         return view('users.create', compact('roles', 'departments', 'hods', 'deptUserRoleId'));
@@ -51,7 +55,12 @@ class UserController extends Controller
         $roles = Role::all();
         $departments = Department::all();
         $hodRole = Role::where('name', 'HOD')->first();
-        $hods = $hodRole ? User::where('role_id', $hodRole->id)->get() : collect();
+        $hods = User::where(function($q) use ($hodRole) {
+            if ($hodRole) {
+                $q->where('role_id', $hodRole->id);
+            }
+            $q->orWhere('name', 'General Manager');
+        })->get();
         $deptUserRoleId = Role::where('name', 'Department User')->first()?->id;
         return view('users.edit', compact('user', 'roles', 'departments', 'hods', 'deptUserRoleId'));
     }
